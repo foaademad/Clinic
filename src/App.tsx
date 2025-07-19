@@ -12,10 +12,11 @@ import Services from './pages/Services';
 import BookSession from './pages/BookSession';
 import About from './pages/About';
 import Contact from './pages/Contact';
-
+import { Provider } from 'react-redux';
+import { store } from './store/store';
 function App() {
   return (
-    <AuthProvider>
+      <Provider store={store}>
       <Router>
         <div className="min-h-screen flex flex-col">
           <Header />
@@ -35,7 +36,7 @@ function App() {
           <Footer />
         </div>
       </Router>
-    </AuthProvider>
+    </Provider>
   );
 }
 

@@ -2,7 +2,10 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
+  import { useAuth } from '../contexts/AuthContext';
+import { register } from '../store/api/authApi';
+import { useDispatch, useSelector } from 'react-redux';
+import { AppDispatch, RootState } from '../store/store';
 
 const Signup = () => {
   const [name, setName] = useState('');
@@ -12,9 +15,9 @@ const Signup = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState('');
-  const { signup, isLoading } = useAuth();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
-
+  const { loading } = useSelector((state: RootState) => state.auth);
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
@@ -29,7 +32,7 @@ const Signup = () => {
       return;
     }
     
-    const success = await signup(name, email, password);
+    const success = await register({ name, email, password, age: 0, role: '', phone: '', imgaeurl: '' }, dispatch);
     if (success) {
       navigate('/');
     } else {
@@ -193,12 +196,12 @@ const Signup = () => {
 
           <motion.button
             type="submit"
-            disabled={isLoading}
+            disabled={loading}
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-medium rounded-lg text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all"
           >
-            {isLoading ? (
+            {loading ? (
               <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
             ) : (
               <>

@@ -2,15 +2,18 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Phone, Calendar, ChevronDown, User, LogOut } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
+// import { useAuth } from '../contexts/AuthContext';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState, AppDispatch } from '../store/store';
 
 const Header = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isServicesOpen, setIsServicesOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const location = useLocation();
-  const { user, logout } = useAuth();
-
+  // const { user, logout } = useAuth();
+  const { user } = useSelector((state: RootState) => state.auth);
+  const dispatch = useDispatch<AppDispatch>();
   const isActive = (path: string) => location.pathname === path;
 
   return (
@@ -177,7 +180,7 @@ const Header = () => {
                         My Appointments
                       </Link>
                       <button
-                        onClick={logout}
+                        onClick={() => console.log("logout")}
                         className="w-full text-left px-4 py-2 text-gray-700 hover:text-red-600 hover:bg-red-50 flex items-center"
                       >
                         <LogOut className="w-4 h-4 mr-2" />
