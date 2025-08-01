@@ -4,6 +4,7 @@ import authReducer from './slice/authSlice';
 import bookingReducer from './slice/bookingSlice';  
 import doctorsReducer from '../store/slice/doctorSlice';  
 import doctorDetailReducer from "./slice/doctorDetailSlice";
+import servicesReducer from "./slice/servicesSlice"; 
 
 
 export const store = configureStore({
@@ -12,6 +13,7 @@ export const store = configureStore({
     booking: bookingReducer,     
     doctors: doctorsReducer,
     doctorDetail: doctorDetailReducer,
+        services: servicesReducer,
   },
 });
 

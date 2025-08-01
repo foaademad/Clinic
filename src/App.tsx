@@ -14,7 +14,8 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import { Provider } from 'react-redux';
 import { store } from './store/store';
-
+import AppointmentPage from './pages/BookSession';
+import Hero from './components/Hero.tsx';
 function App() {
   return (
     <Provider store={store}>
@@ -33,6 +34,8 @@ function App() {
                 <Route path="/book/:doctorId?" element={<BookSession />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/" element={<Hero />} />
+        <Route path="/appointment" element={<AppointmentPage />} />
               </Routes>
             </main>
             <Footer />

@@ -1,8 +1,13 @@
-import React, { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
-import { Heart, Baby, Bone, Eye, Brain, Stethoscope, Activity, Shield, Clock, DollarSign, Search, Filter } from 'lucide-react';
-import { services } from '../data/services';
+import {
+  Heart, Baby, Bone, Eye, Brain, Stethoscope,
+  Activity, Shield, Clock, DollarSign, Search, Filter
+} from 'lucide-react';
+import { useAppDispatch, useAppSelector } from '../hooks/hooks.ts';
+import { setServices } from '../store/slice/servicesSlice.ts';
+import { services as staticServices } from '../data/services';
 
 const iconMap = {
   Heart,
@@ -16,15 +21,26 @@ const iconMap = {
 };
 
 const Services = () => {
+  const dispatch = useAppDispatch();
+  const services = useAppSelector((state) => state.services.services);
+
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('');
+
+  // Load services into Redux on first mount (you can replace this with API later)
+  useEffect(() => {
+    dispatch(setServices(staticServices));
+  }, [dispatch]);
 
   const categories = [...new Set(services.map(service => service.category))];
 
   const filteredServices = services.filter(service => {
-    const matchesSearch = service.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         service.description.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesSearch =
+      service.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      service.description.toLowerCase().includes(searchTerm.toLowerCase());
+
     const matchesCategory = selectedCategory === '' || service.category === selectedCategory;
+
     return matchesSearch && matchesCategory;
   });
 
@@ -44,16 +60,15 @@ const Services = () => {
     visible: {
       y: 0,
       opacity: 1,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut"
-      }
+      transition: { duration: 0.6, ease: "easeOut" }
     }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
       <div className="container mx-auto px-4">
+
+        {/* Page Header */}
         <motion.div
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -64,11 +79,11 @@ const Services = () => {
             Our Medical Services
           </h1>
           <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Comprehensive healthcare services with experienced specialists and state-of-the-art facilities to ensure the best possible care for our patients.
+            Comprehensive healthcare services with experienced specialists and state-of-the-art facilities.
           </p>
         </motion.div>
 
-        {/* Search and Filter */}
+        {/* Search & Filter */}
         <motion.div
           initial={{ y: 30, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -76,8 +91,9 @@ const Services = () => {
           className="bg-white rounded-2xl p-6 shadow-lg mb-12"
         >
           <div className="grid md:grid-cols-2 gap-4">
+            {/* Search */}
             <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <input
                 type="text"
                 placeholder="Search services..."
@@ -86,12 +102,14 @@ const Services = () => {
                 className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
             </div>
+
+            {/* Category Filter */}
             <div className="relative">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+              <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
               <select
                 value={selectedCategory}
                 onChange={(e) => setSelectedCategory(e.target.value)}
-                className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all appearance-none"
+                className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               >
                 <option value="">All Categories</option>
                 {categories.map(category => (
@@ -111,7 +129,7 @@ const Services = () => {
         >
           {filteredServices.map((service) => {
             const IconComponent = iconMap[service.icon as keyof typeof iconMap];
-            
+
             return (
               <motion.div
                 key={service.id}
@@ -132,11 +150,11 @@ const Services = () => {
                     {service.category}
                   </div>
                 </div>
-                
+
                 <div className="p-6">
                   <h3 className="text-xl font-bold text-gray-900 mb-3">{service.title}</h3>
                   <p className="text-gray-600 mb-4 leading-relaxed">{service.description}</p>
-                  
+
                   <div className="space-y-3 mb-6">
                     <div className="flex items-center text-gray-600">
                       <DollarSign className="w-4 h-4 mr-2 text-green-600" />
@@ -164,7 +182,7 @@ const Services = () => {
                       )}
                     </ul>
                   </div>
-                  
+
                   <div className="flex gap-3">
                     <Link
                       to={`/book?service=${service.id}`}
@@ -192,7 +210,7 @@ const Services = () => {
           </motion.div>
         )}
 
-        {/* CTA Section */}
+        {/* CTA */}
         <motion.div
           initial={{ y: 50, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
@@ -220,6 +238,7 @@ const Services = () => {
             </div>
           </div>
         </motion.div>
+
       </div>
     </div>
   );
