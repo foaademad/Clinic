@@ -1,24 +1,36 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
 import { useParams, useSearchParams, Link } from 'react-router-dom';
 import { Calendar, Clock, User, Phone, Mail, CreditCard, ArrowLeft, Check } from 'lucide-react';
 import { doctors } from '../data/doctors';
 import { services } from '../data/services';
-import { useAuth } from '../contexts/AuthContext';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState, AppDispatch } from '../store/store';
+import { setSelectedDate, setSelectedTime,setSelectedDoctor,
+   setAppointmentType, setNotes,setIsSubmitting,setIsBooked, resetBooking,
+} from '../store/slice/bookingSlice';
 
 const BookSession = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const { doctorId } = useParams();
   const [searchParams] = useSearchParams();
   const serviceId = searchParams.get('service');
-  const { user } = useAuth();
 
-  const [selectedDate, setSelectedDate] = useState('');
-  const [selectedTime, setSelectedTime] = useState('');
-  const [selectedDoctor, setSelectedDoctor] = useState(doctorId || '');
-  const [appointmentType, setAppointmentType] = useState('consultation');
-  const [notes, setNotes] = useState('');
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [isBooked, setIsBooked] = useState(false);
+  const {
+    selectedDate,
+    selectedTime,
+    selectedDoctor,
+    appointmentType,
+    notes,
+    isSubmitting,
+    isBooked,
+  } = useSelector((state: RootState) => state.booking);
+
+  React.useEffect(() => {
+    if (doctorId && !selectedDoctor) {
+      dispatch(setSelectedDoctor(doctorId));
+    }
+  }, [doctorId, selectedDoctor, dispatch]);
 
   const doctor = selectedDoctor ? doctors.find(d => d.id === selectedDoctor) : null;
   const service = serviceId ? services.find(s => s.id === serviceId) : null;
@@ -43,13 +55,12 @@ const BookSession = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsSubmitting(true);
+    dispatch(setIsSubmitting(true));
     
-    // Simulate API call
     await new Promise(resolve => setTimeout(resolve, 2000));
     
-    setIsSubmitting(false);
-    setIsBooked(true);
+    dispatch(setIsSubmitting(false));
+    dispatch(setIsBooked(true));
   };
 
   if (isBooked) {
@@ -77,12 +88,14 @@ const BookSession = () => {
             <Link
               to="/"
               className="block w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors"
+              onClick={() => dispatch(resetBooking())}
             >
               Back to Home
             </Link>
             <Link
               to="/doctors"
               className="block w-full border border-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-50 transition-colors"
+              onClick={() => dispatch(resetBooking())}
             >
               View All Doctors
             </Link>
@@ -130,7 +143,7 @@ const BookSession = () => {
                       <motion.div
                         key={doc.id}
                         whileHover={{ scale: 1.02 }}
-                        onClick={() => setSelectedDoctor(doc.id)}
+                        onClick={() => dispatch(setSelectedDoctor(doc.id))}
                         className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
                           selectedDoctor === doc.id
                             ? 'border-blue-600 bg-blue-50'
@@ -163,7 +176,7 @@ const BookSession = () => {
                     <motion.div
                       key={type}
                       whileHover={{ scale: 1.02 }}
-                      onClick={() => setAppointmentType(type)}
+                      onClick={() => dispatch(setAppointmentType(type))}
                       className={`p-4 border-2 rounded-lg cursor-pointer transition-all text-center ${
                         appointmentType === type
                           ? 'border-blue-600 bg-blue-50'
@@ -190,7 +203,7 @@ const BookSession = () => {
                       key={date.toISOString()}
                       type="button"
                       whileHover={{ scale: 1.05 }}
-                      onClick={() => setSelectedDate(date.toISOString().split('T')[0])}
+                      onClick={() => dispatch(setSelectedDate(date.toISOString().split('T')[0]))}
                       className={`p-3 rounded-lg text-center transition-all ${
                         selectedDate === date.toISOString().split('T')[0]
                           ? 'bg-blue-600 text-white'
@@ -218,7 +231,7 @@ const BookSession = () => {
                         key={time}
                         type="button"
                         whileHover={{ scale: 1.05 }}
-                        onClick={() => setSelectedTime(time)}
+                        onClick={() => dispatch(setSelectedTime(time))}
                         className={`p-3 rounded-lg text-center transition-all ${
                           selectedTime === time
                             ? 'bg-green-600 text-white'
@@ -244,7 +257,7 @@ const BookSession = () => {
                       <input
                         type="text"
                         required
-                        defaultValue={user?.name || ''}
+                        defaultValue="" // You can also manage these fields with Redux if needed
                         className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                         placeholder="Enter your full name"
                       />
@@ -269,7 +282,7 @@ const BookSession = () => {
                       <input
                         type="email"
                         required
-                        defaultValue={user?.email || ''}
+                        defaultValue="" // or user.email if available
                         className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                         placeholder="Enter your email address"
                       />
@@ -279,7 +292,7 @@ const BookSession = () => {
                     <label className="block text-sm font-medium text-gray-700 mb-2">Additional Notes</label>
                     <textarea
                       value={notes}
-                      onChange={(e) => setNotes(e.target.value)}
+                      onChange={(e) => dispatch(setNotes(e.target.value))}
                       rows={3}
                       className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                       placeholder="Any specific concerns or symptoms..."
@@ -317,7 +330,7 @@ const BookSession = () => {
           >
             <div className="bg-white rounded-2xl p-6 shadow-lg sticky top-6">
               <h3 className="text-xl font-bold text-gray-900 mb-6">Booking Summary</h3>
-              
+
               {doctor && (
                 <div className="mb-6">
                   <div className="flex items-center mb-4">

@@ -1,12 +1,13 @@
-import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { Star, MapPin, Clock, Search, Filter } from 'lucide-react';
-import { doctors } from '../data/doctors';
+import { useSelector, useDispatch } from 'react-redux';
+import { RootState } from '../store/store';
+import { setSearchTerm, setSelectedSpecialty } from '../store/slice/doctorSlice.ts';
 
 const Doctors = () => {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedSpecialty, setSelectedSpecialty] = useState('');
+  const dispatch = useDispatch();
+  const { doctors, searchTerm, selectedSpecialty } = useSelector((state: RootState) => state.doctors);
 
   const specialties = [...new Set(doctors.map(doctor => doctor.specialty))];
 
@@ -71,7 +72,7 @@ const Doctors = () => {
                 type="text"
                 placeholder="Search doctors by name or specialty..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => dispatch(setSearchTerm(e.target.value))}
                 className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               />
             </div>
@@ -79,7 +80,7 @@ const Doctors = () => {
               <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
               <select
                 value={selectedSpecialty}
-                onChange={(e) => setSelectedSpecialty(e.target.value)}
+                onChange={(e) => dispatch(setSelectedSpecialty(e.target.value))}
                 className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all appearance-none"
               >
                 <option value="">All Specialties</option>
@@ -116,11 +117,11 @@ const Doctors = () => {
                   <span className="text-sm font-semibold">{doctor.rating}</span>
                 </div>
               </div>
-              
+
               <div className="p-6">
                 <h3 className="text-xl font-bold text-gray-900 mb-2">{doctor.name}</h3>
                 <p className="text-blue-600 font-semibold mb-3">{doctor.specialty}</p>
-                
+
                 <div className="space-y-2 mb-4">
                   <div className="flex items-center text-gray-600">
                     <Clock className="w-4 h-4 mr-2" />
@@ -131,7 +132,7 @@ const Doctors = () => {
                     <span className="text-sm">{doctor.location}</span>
                   </div>
                 </div>
-                
+
                 <div className="flex items-center justify-between">
                   <div>
                     <span className="text-2xl font-bold text-gray-900">${doctor.consultationFee}</span>

@@ -2,11 +2,9 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
-  import { useAuth } from '../contexts/AuthContext';
 import { register } from '../store/api/authApi';
 import { useDispatch, useSelector } from 'react-redux';
 import { AppDispatch, RootState } from '../store/store';
-
 const Signup = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -18,20 +16,21 @@ const Signup = () => {
   const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
   const { loading } = useSelector((state: RootState) => state.auth);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError('');
-    
+
     if (password !== confirmPassword) {
       setError('Passwords do not match');
       return;
     }
-    
+
     if (password.length < 6) {
       setError('Password must be at least 6 characters');
       return;
     }
-    
+
     const success = await register({ name, email, password, age: 0, role: '', phone: '', imgaeurl: '' }, dispatch);
     if (success) {
       navigate('/');
@@ -60,7 +59,6 @@ const Signup = () => {
           <h2 className="text-3xl font-bold text-gray-900">Create Account</h2>
           <p className="mt-2 text-gray-600">Join our healthcare community</p>
         </div>
-
         <motion.form
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
@@ -88,7 +86,6 @@ const Signup = () => {
                 />
               </div>
             </div>
-
             <div>
               <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
                 Email Address
@@ -108,7 +105,6 @@ const Signup = () => {
                 />
               </div>
             </div>
-
             <div>
               <label htmlFor="password" className="block text-sm font-medium text-gray-700 mb-2">
                 Password
@@ -135,7 +131,6 @@ const Signup = () => {
                 </button>
               </div>
             </div>
-
             <div>
               <label htmlFor="confirmPassword" className="block text-sm font-medium text-gray-700 mb-2">
                 Confirm Password
@@ -163,7 +158,6 @@ const Signup = () => {
               </div>
             </div>
           </div>
-
           {error && (
             <motion.div
               initial={{ opacity: 0, y: -10 }}
@@ -173,7 +167,6 @@ const Signup = () => {
               {error}
             </motion.div>
           )}
-
           <div className="flex items-center">
             <input
               id="terms"
@@ -193,7 +186,6 @@ const Signup = () => {
               </Link>
             </label>
           </div>
-
           <motion.button
             type="submit"
             disabled={loading}
@@ -210,7 +202,6 @@ const Signup = () => {
               </>
             )}
           </motion.button>
-
           <div className="text-center">
             <span className="text-gray-600">Already have an account? </span>
             <Link to="/login" className="text-green-600 hover:text-green-500 font-medium">

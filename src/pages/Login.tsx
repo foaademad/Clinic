@@ -1,26 +1,36 @@
-import React, { useState } from 'react';
+import * as React from 'react';
+import { useState } from 'react';
 import { motion } from 'framer-motion';
 import { Link, useNavigate } from 'react-router-dom';
 import { Mail, Lock, Eye, EyeOff, ArrowRight } from 'lucide-react';
-import { useAuth } from '../contexts/AuthContext';
+import { useDispatch, useSelector } from 'react-redux';
+import { RootState, AppDispatch } from '../store/store.ts';
+import { setUser, setLoading, setError } from '../store/slice/authSlice'; 
+import { api } from '../store/utility/api';
 
 const Login = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  const [error, setError] = useState('');
-  const { login, isLoading } = useAuth();
+  const dispatch = useDispatch<AppDispatch>();
   const navigate = useNavigate();
+
+  const { loading: isLoading, error } = useSelector((state: RootState) => state.auth);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError('');
-    
-    const success = await login(email, password);
-    if (success) {
+    dispatch(setError(null));
+    dispatch(setLoading(true));
+
+    try {
+       const response = await api.post('/login', { email, password });
+       console.log(response.data);  
+      dispatch(setUser(response.data)); 
       navigate('/');
-    } else {
-      setError('Invalid email or password');
+    } catch (err: any) {
+      dispatch(setError(err.response?.data?.message || 'Invalid email or password'));
+    } finally {
+      dispatch(setLoading(false));
     }
   };
 

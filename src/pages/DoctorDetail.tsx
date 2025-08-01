@@ -1,19 +1,40 @@
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { useParams, Link } from 'react-router-dom';
-import { Star, MapPin, Phone, Mail, Clock, Calendar, Globe, Award, ArrowLeft } from 'lucide-react';
-import { doctors } from '../data/doctors';
+
+import { motion } from "framer-motion";
+import { useParams, Link } from "react-router-dom";
+import {
+  Star,
+  MapPin,
+  Phone,
+  Mail,
+  Clock,
+  Calendar,
+  Globe,
+  Award,
+  ArrowLeft,
+} from "lucide-react";
+import { doctors } from "../data/doctors";
+
+import { useSelector, useDispatch } from "react-redux";
+import { RootState, AppDispatch } from "../store/store";
+import { setSelectedDay } from "../store/slice/doctorDetailSlice";
 
 const DoctorDetail = () => {
+  const dispatch = useDispatch<AppDispatch>();
   const { id } = useParams();
-  const doctor = doctors.find(d => d.id === id);
-  const [selectedDay, setSelectedDay] = useState('Monday');
+  const doctor = doctors.find((d) => d.id === id);
+
+  // Redux state for selected day
+  const selectedDay = useSelector(
+    (state: RootState) => state.doctorDetail.selectedDay
+  );
 
   if (!doctor) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h1 className="text-2xl font-bold text-gray-900 mb-4">Doctor not found</h1>
+          <h1 className="text-2xl font-bold text-gray-900 mb-4">
+            Doctor not found
+          </h1>
           <Link to="/doctors" className="text-blue-600 hover:text-blue-500">
             Back to Doctors
           </Link>
@@ -22,7 +43,15 @@ const DoctorDetail = () => {
     );
   }
 
-  const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+  const days = [
+    "Monday",
+    "Tuesday",
+    "Wednesday",
+    "Thursday",
+    "Friday",
+    "Saturday",
+    "Sunday",
+  ];
 
   return (
     <div className="min-h-screen bg-gray-50 py-12">
@@ -60,14 +89,18 @@ const DoctorDetail = () => {
                 />
                 <div className="flex-1">
                   <div className="flex items-center mb-4">
-                    <h1 className="text-3xl font-bold text-gray-900 mr-4">{doctor.name}</h1>
+                    <h1 className="text-3xl font-bold text-gray-900 mr-4">
+                      {doctor.name}
+                    </h1>
                     <div className="flex items-center bg-yellow-50 px-3 py-1 rounded-full">
                       <Star className="w-4 h-4 text-yellow-400 fill-current mr-1" />
                       <span className="font-semibold">{doctor.rating}</span>
                     </div>
                   </div>
-                  <p className="text-xl text-blue-600 font-semibold mb-4">{doctor.specialty}</p>
-                  
+                  <p className="text-xl text-blue-600 font-semibold mb-4">
+                    {doctor.specialty}
+                  </p>
+
                   <div className="grid md:grid-cols-2 gap-4 mb-6">
                     <div className="flex items-center text-gray-600">
                       <Award className="w-5 h-5 mr-3 text-blue-600" />
@@ -112,7 +145,9 @@ const DoctorDetail = () => {
                   </div>
 
                   <div className="text-center md:text-left">
-                    <span className="text-3xl font-bold text-gray-900">${doctor.consultationFee}</span>
+                    <span className="text-3xl font-bold text-gray-900">
+                      ${doctor.consultationFee}
+                    </span>
                     <span className="text-gray-600 ml-2">per consultation</span>
                   </div>
                 </div>
@@ -126,9 +161,11 @@ const DoctorDetail = () => {
               transition={{ delay: 0.2, duration: 0.6 }}
               className="bg-white rounded-2xl p-8 shadow-lg"
             >
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">About Dr. {doctor.name.split(' ')[1]}</h2>
+              <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                About Dr. {doctor.name.split(" ")[1]}
+              </h2>
               <p className="text-gray-700 leading-relaxed mb-6">{doctor.about}</p>
-              
+
               <div className="border-t pt-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">Education</h3>
                 <p className="text-gray-700">{doctor.education}</p>
@@ -143,16 +180,16 @@ const DoctorDetail = () => {
               className="bg-white rounded-2xl p-8 shadow-lg"
             >
               <h2 className="text-2xl font-bold text-gray-900 mb-6">Weekly Schedule</h2>
-              
+
               <div className="grid grid-cols-7 gap-2 mb-6">
                 {days.map((day) => (
                   <button
                     key={day}
-                    onClick={() => setSelectedDay(day)}
+                    onClick={() => dispatch(setSelectedDay(day))}
                     className={`p-3 rounded-lg text-sm font-medium transition-all ${
                       selectedDay === day
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                        ? "bg-blue-600 text-white"
+                        : "bg-gray-100 text-gray-700 hover:bg-gray-200"
                     }`}
                   >
                     {day.slice(0, 3)}
@@ -178,7 +215,9 @@ const DoctorDetail = () => {
                     ))}
                   </div>
                 ) : (
-                  <p className="text-gray-500 text-center py-8">No available times on {selectedDay}</p>
+                  <p className="text-gray-500 text-center py-8">
+                    No available times on {selectedDay}
+                  </p>
                 )}
               </div>
             </motion.div>
@@ -193,7 +232,7 @@ const DoctorDetail = () => {
           >
             <div className="bg-white rounded-2xl p-6 shadow-lg sticky top-6">
               <h3 className="text-xl font-bold text-gray-900 mb-6">Book Appointment</h3>
-              
+
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Consultation Fee</span>
