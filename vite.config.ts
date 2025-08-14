@@ -7,4 +7,14 @@ export default defineConfig({
   optimizeDeps: {
     exclude: ['lucide-react'],
   },
+  server: {
+    cors: true,
+    proxy: {
+      '/api': {
+        target: process.env.VITE_API_URL || 'https://clinic-gules-theta.vercel.app',
+        changeOrigin: true,
+        secure: true,
+      },
+    },
+  },
 });

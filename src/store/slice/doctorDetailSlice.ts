@@ -1,4 +1,3 @@
-// src/redux/slice/doctorDetailSlice.ts
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 interface DoctorDetailState {
@@ -6,7 +5,7 @@ interface DoctorDetailState {
 }
 
 const initialState: DoctorDetailState = {
-  selectedDay: 'Monday',  // default day
+  selectedDay: 'Monday',  
 };
 
 const doctorDetailSlice = createSlice({

@@ -1,246 +1,97 @@
-import { useEffect, useState } from 'react';
+import React from 'react';
 import { motion } from 'framer-motion';
-import { Link } from 'react-router-dom';
-import {
-  Heart, Baby, Bone, Eye, Brain, Stethoscope,
-  Activity, Shield, Clock, DollarSign, Search, Filter
-} from 'lucide-react';
-import { useAppDispatch, useAppSelector } from '../hooks/hooks.ts';
-import { setServices } from '../store/slice/servicesSlice.ts';
-import { services as staticServices } from '../data/services';
-
-const iconMap = {
-  Heart,
-  Baby,
-  Bone,
-  Eye,
-  Brain,
-  Stethoscope,
-  Activity,
-  Shield
-};
+import { Heart, Baby, Bone, Eye, Brain, Stethoscope, Activity, Shield } from 'lucide-react';
 
 const Services = () => {
-  const dispatch = useAppDispatch();
-  const services = useAppSelector((state) => state.services.services);
-
-  const [searchTerm, setSearchTerm] = useState('');
-  const [selectedCategory, setSelectedCategory] = useState('');
-
-  // Load services into Redux on first mount (you can replace this with API later)
-  useEffect(() => {
-    dispatch(setServices(staticServices));
-  }, [dispatch]);
-
-  const categories = [...new Set(services.map(service => service.category))];
-
-  const filteredServices = services.filter(service => {
-    const matchesSearch =
-      service.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      service.description.toLowerCase().includes(searchTerm.toLowerCase());
-
-    const matchesCategory = selectedCategory === '' || service.category === selectedCategory;
-
-    return matchesSearch && matchesCategory;
-  });
+  const services = [
+    { icon: <Stethoscope size={28} />, title: "General Medicine", description: "Comprehensive primary care for all ages with preventive health focus.", gradient: "from-blue-400 to-blue-600" },
+    { icon: <Heart size={28} />, title: "Cardiology", description: "Heart diagnostics, treatment & preventive care with advanced technology.", gradient: "from-pink-500 to-red-500" },
+    { icon: <Baby size={28} />, title: "Pediatrics", description: "Gentle, expert care for infants, children, and adolescents.", gradient: "from-pink-400 to-pink-600" },
+    { icon: <Bone size={28} />, title: "Orthopedics", description: "Bone, joint & muscle treatments with advanced surgical expertise.", gradient: "from-orange-400 to-orange-600" },
+    { icon: <Eye size={28} />, title: "Ophthalmology", description: "Complete vision care, correction & eye surgeries.", gradient: "from-green-400 to-green-600" },
+    { icon: <Brain size={28} />, title: "Neurology", description: "Nervous system disorder diagnosis & treatment.", gradient: "from-purple-400 to-purple-600" },
+    { icon: <Activity size={28} />, title: "Emergency Care", description: "24/7 emergency services with rapid response.", gradient: "from-red-500 to-red-700" },
+    { icon: <Shield size={28} />, title: "Preventive Care", description: "Health screenings to maintain optimal wellness.", gradient: "from-teal-400 to-teal-600" }
+  ];
 
   const containerVariants = {
     hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.2
-      }
-    }
+    visible: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.2 } }
   };
 
   const cardVariants = {
     hidden: { y: 50, opacity: 0 },
-    visible: {
-      y: 0,
-      opacity: 1,
-      transition: { duration: 0.6, ease: "easeOut" }
-    }
+    visible: { y: 0, opacity: 1, transition: { duration: 0.6, ease: "easeOut" } }
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 py-12">
+    <section id="services" className="py-20 bg-gradient-to-b from-gray-50 to-white">
       <div className="container mx-auto px-4">
-
-        {/* Page Header */}
         <motion.div
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
+          initial={{ y: 30, opacity: 0 }}
+          whileInView={{ y: 0, opacity: 1 }}
+          viewport={{ once: true }}
           transition={{ duration: 0.6 }}
-          className="text-center mb-12"
+          className="text-center mb-16"
         >
-          <h1 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
+          <h2 className="text-4xl lg:text-5xl font-extrabold text-gray-900 tracking-tight">
             Our Medical Services
-          </h1>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            Comprehensive healthcare services with experienced specialists and state-of-the-art facilities.
+          </h2>
+          <p className="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
+            Experience world-class care with our expert doctors and modern facilities.
           </p>
         </motion.div>
 
-        {/* Search & Filter */}
-        <motion.div
-          initial={{ y: 30, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.3, duration: 0.6 }}
-          className="bg-white rounded-2xl p-6 shadow-lg mb-12"
-        >
-          <div className="grid md:grid-cols-2 gap-4">
-            {/* Search */}
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <input
-                type="text"
-                placeholder="Search services..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              />
-            </div>
-
-            {/* Category Filter */}
-            <div className="relative">
-              <Filter className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5" />
-              <select
-                value={selectedCategory}
-                onChange={(e) => setSelectedCategory(e.target.value)}
-                className="pl-10 w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              >
-                <option value="">All Categories</option>
-                {categories.map(category => (
-                  <option key={category} value={category}>{category}</option>
-                ))}
-              </select>
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Services Grid */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
-          animate="visible"
-          className="grid md:grid-cols-2 lg:grid-cols-3 gap-8"
+          whileInView="visible"
+          viewport={{ once: true }}
+          className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
         >
-          {filteredServices.map((service) => {
-            const IconComponent = iconMap[service.icon as keyof typeof iconMap];
-
-            return (
-              <motion.div
-                key={service.id}
-                variants={cardVariants}
-                whileHover={{ y: -10, scale: 1.02 }}
-                className="bg-white rounded-2xl overflow-hidden shadow-lg hover:shadow-xl transition-all duration-300"
+          {services.map((service, index) => (
+            <motion.div
+              key={index}
+              variants={cardVariants}
+              whileHover={{
+                y: -8,
+                scale: 1.03,
+                boxShadow: "0 20px 40px rgba(0,0,0,0.08)"
+              }}
+              className="backdrop-blur-lg bg-white/70 border border-gray-100 rounded-2xl p-8 transition-all duration-300"
+            >
+              <div className={`w-16 h-16 rounded-xl bg-gradient-to-r ${service.gradient} flex items-center justify-center text-white mb-6 shadow-lg`}>
+                {service.icon}
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900">{service.title}</h3>
+              <p className="mt-3 text-gray-600 text-sm leading-relaxed">{service.description}</p>
+              <motion.button
+                whileHover={{ x: 5 }}
+                className="mt-4 inline-block text-blue-600 font-medium hover:text-blue-800 transition"
               >
-                <div className="relative">
-                  <img
-                    src={service.image}
-                    alt={service.title}
-                    className="w-full h-48 object-cover"
-                  />
-                  <div className="absolute top-4 left-4 bg-white rounded-full p-3">
-                    {IconComponent && <IconComponent className="w-6 h-6 text-blue-600" />}
-                  </div>
-                  <div className="absolute top-4 right-4 bg-blue-600 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                    {service.category}
-                  </div>
-                </div>
-
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-gray-900 mb-3">{service.title}</h3>
-                  <p className="text-gray-600 mb-4 leading-relaxed">{service.description}</p>
-
-                  <div className="space-y-3 mb-6">
-                    <div className="flex items-center text-gray-600">
-                      <DollarSign className="w-4 h-4 mr-2 text-green-600" />
-                      <span className="text-sm">{service.price}</span>
-                    </div>
-                    <div className="flex items-center text-gray-600">
-                      <Clock className="w-4 h-4 mr-2 text-blue-600" />
-                      <span className="text-sm">{service.duration}</span>
-                    </div>
-                  </div>
-
-                  <div className="mb-6">
-                    <h4 className="font-semibold text-gray-900 mb-2">Key Features:</h4>
-                    <ul className="space-y-1">
-                      {service.features.slice(0, 3).map((feature, index) => (
-                        <li key={index} className="text-sm text-gray-600 flex items-center">
-                          <div className="w-1.5 h-1.5 bg-blue-600 rounded-full mr-2"></div>
-                          {feature}
-                        </li>
-                      ))}
-                      {service.features.length > 3 && (
-                        <li className="text-sm text-blue-600">
-                          +{service.features.length - 3} more features
-                        </li>
-                      )}
-                    </ul>
-                  </div>
-
-                  <div className="flex gap-3">
-                    <Link
-                      to={`/book?service=${service.id}`}
-                      className="flex-1 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors text-center font-semibold"
-                    >
-                      Book Now
-                    </Link>
-                    <button className="px-4 py-2 border border-blue-600 text-blue-600 rounded-lg hover:bg-blue-50 transition-colors">
-                      Learn More
-                    </button>
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
+                Learn More →
+              </motion.button>
+            </motion.div>
+          ))}
         </motion.div>
 
-        {filteredServices.length === 0 && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="text-center py-12"
-          >
-            <p className="text-gray-600 text-lg">No services found matching your criteria.</p>
-          </motion.div>
-        )}
-
-        {/* CTA */}
         <motion.div
-          initial={{ y: 50, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ delay: 0.5, duration: 0.6 }}
+          initial={{ y: 30, opacity: 0 }}
+          whileInView={{ y: 0, opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ delay: 0.3, duration: 0.6 }}
           className="text-center mt-16"
         >
-          <div className="bg-gradient-to-r from-blue-600 to-blue-800 rounded-2xl p-12 text-white">
-            <h2 className="text-3xl font-bold mb-4">Need Help Choosing?</h2>
-            <p className="text-xl text-blue-100 mb-8 max-w-2xl mx-auto">
-              Our medical experts are here to help you find the right service for your healthcare needs.
-            </p>
-            <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Link
-                to="/contact"
-                className="bg-white text-blue-600 px-8 py-3 rounded-full font-semibold hover:bg-gray-100 transition-colors"
-              >
-                Contact Us
-              </Link>
-              <Link
-                to="/doctors"
-                className="border-2 border-white text-white px-8 py-3 rounded-full font-semibold hover:bg-white hover:text-blue-600 transition-colors"
-              >
-                Find a Doctor
-              </Link>
-            </div>
-          </div>
+          <motion.button
+            whileHover={{ scale: 1.05, y: -2 }}
+            whileTap={{ scale: 0.95 }}
+            className="px-8 py-4 rounded-full bg-blue-600 text-white font-semibold shadow-lg hover:bg-blue-700 transition"
+          >
+            View All Services
+          </motion.button>
         </motion.div>
-
       </div>
-    </div>
+    </section>
   );
 };
 

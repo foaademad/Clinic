@@ -1,197 +1,135 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { Star, Quote } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchTestimonials } from '../store/slice/testimonialsSlice';
+import { AppDispatch, RootState } from '../store/store';
 
 const Testimonials = () => {
-  const testimonials = [
-    {
-      name: "Sarah Johnson",
-      role: "Patient",
-      image: "https://images.pexels.com/photos/4173251/pexels-photo-4173251.jpeg?auto=compress&cs=tinysrgb&w=150",
-      rating: 5,
-      text: "The care I received at Medisch was exceptional. The doctors were knowledgeable, compassionate, and took the time to explain everything clearly. I felt truly cared for."
-    },
-    {
-      name: "Michael Chen",
-      role: "Patient",
-      image: "https://images.pexels.com/photos/4173251/pexels-photo-4173251.jpeg?auto=compress&cs=tinysrgb&w=150",
-      rating: 5,
-      text: "Outstanding medical facility with state-of-the-art equipment. The staff is professional and the service is prompt. I highly recommend Medisch for all your healthcare needs."
-    },
-    {
-      name: "Emily Rodriguez",
-      role: "Patient",
-      image: "https://images.pexels.com/photos/4173251/pexels-photo-4173251.jpeg?auto=compress&cs=tinysrgb&w=150",
-      rating: 5,
-      text: "From the moment I walked in, I was impressed by the cleanliness and organization. The medical team is top-notch and the treatment I received was excellent."
-    },
-    {
-      name: "David Thompson",
-      role: "Patient",
-      image: "https://images.pexels.com/photos/4173251/pexels-photo-4173251.jpeg?auto=compress&cs=tinysrgb&w=150",
-      rating: 5,
-      text: "The emergency care I received was incredible. The response time was fast and the medical team was professional and caring during a very stressful time."
-    }
-  ];
+  const dispatch = useDispatch<AppDispatch>();
+  const testimonials = useSelector((state: RootState) => state.testimonials.items);
+  const loading = useSelector((state: RootState) => state.testimonials.loading);
+  const error = useSelector((state: RootState) => state.testimonials.error);
+
+  useEffect(() => {
+    dispatch(fetchTestimonials());
+  }, [dispatch]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
-      transition: {
-        staggerChildren: 0.2,
-        delayChildren: 0.3
-      }
+      transition: { staggerChildren: 0.2, delayChildren: 0.3 }
     }
   };
 
   const cardVariants = {
-    hidden: { y: 50, opacity: 0 },
+    hidden: { y: 40, opacity: 0 },
     visible: {
-      y: 0,
-      opacity: 1,
-      transition: {
-        duration: 0.6,
-        ease: "easeOut"
-      }
+      y: 0, opacity: 1,
+      transition: { duration: 0.6, ease: 'easeOut' }
     }
   };
 
   return (
-    <section id="testimonials" className="py-20 bg-blue-50">
+    <section id="testimonials" className="py-20 bg-gradient-to-b from-blue-50 to-blue-100">
       <div className="container mx-auto px-4">
-        <motion.div 
+        
+    
+        <motion.div
           initial={{ y: 50, opacity: 0 }}
           whileInView={{ y: 0, opacity: 1 }}
-          viewport={{ once: true, margin: "-100px" }}
+          viewport={{ once: true, margin: '-100px' }}
           transition={{ duration: 0.6 }}
           className="text-center mb-16"
         >
-          <h2 className="text-4xl lg:text-5xl font-bold text-gray-900 mb-6">
-            What Our Patients Say
+          <h2 className="text-4xl lg:text-5xl font-extrabold text-gray-900 mb-4">
+            Hear From Our Patients
           </h2>
-          <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-            We take pride in providing exceptional healthcare services. Here's what our patients have to say about their experience with us.
+          <p className="text-lg text-gray-600 max-w-2xl mx-auto">
+            Your trust means everything to us — here’s what patients are saying about our care.
           </p>
         </motion.div>
 
-        <motion.div 
+        {loading && <div className="text-center py-10 text-lg">Loading testimonials...</div>}
+        {error && testimonials.length === 0 && (
+          <div className="text-center py-10 text-red-500">
+            Unable to fetch testimonials. Showing offline content.
+          </div>
+        )}
+
+        <motion.div
           variants={containerVariants}
           initial="hidden"
           whileInView="visible"
-          viewport={{ once: true, margin: "-50px" }}
+          viewport={{ once: true, margin: '-50px' }}
           className="grid md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8"
         >
-          {testimonials.map((testimonial, index) => (
+          {testimonials.map((t, index) => (
             <motion.div
               key={index}
               variants={cardVariants}
-              whileHover={{ 
-                y: -10,
-                scale: 1.02,
-                transition: { duration: 0.3 }
-              }}
-              className="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer"
+              whileHover={{ y: -8, scale: 1.02 }}
+              className="bg-white/80 backdrop-blur-lg rounded-3xl p-8 shadow-md hover:shadow-2xl transition-all"
             >
               <div className="flex items-center mb-6">
                 <motion.img
                   whileHover={{ scale: 1.1 }}
-                  transition={{ duration: 0.3 }}
-                  src={testimonial.image}
-                  alt={testimonial.name}
-                  className="w-16 h-16 rounded-full object-cover mr-4"
+                  src={t.image}
+                  alt={t.name}
+                  className="w-16 h-16 rounded-full object-cover mr-4 ring-4 ring-blue-100"
                 />
                 <div>
-                  <h4 className="font-bold text-gray-900">{testimonial.name}</h4>
-                  <p className="text-gray-600 text-sm">{testimonial.role}</p>
+                  <h4 className="font-bold text-gray-900">{t.name}</h4>
+                  <p className="text-gray-500 text-sm">{t.role}</p>
                 </div>
               </div>
-              
-              <motion.div 
-                initial={{ scale: 0 }}
-                whileInView={{ scale: 1 }}
-                viewport={{ once: true }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
-                className="flex mb-4"
-              >
-                {[...Array(testimonial.rating)].map((_, i) => (
-                  <motion.div
-                    key={i}
-                    initial={{ rotate: 0 }}
-                    whileHover={{ rotate: 360 }}
-                    transition={{ duration: 0.5 }}
-                  >
+
+              <div className="flex mb-4">
+                {[...Array(t.rating)].map((_, i) => (
+                  <motion.div key={i} whileHover={{ rotate: 360 }} transition={{ duration: 0.4 }}>
                     <Star className="w-5 h-5 text-yellow-400 fill-current" />
                   </motion.div>
                 ))}
-              </motion.div>
-              
+              </div>
+
               <div className="relative">
-                <motion.div
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  transition={{ duration: 0.3 }}
-                >
-                  <Quote className="w-8 h-8 text-blue-200 absolute -top-2 -left-2" />
-                </motion.div>
-                <p className="text-gray-700 leading-relaxed pl-6">{testimonial.text}</p>
+                <Quote className="w-8 h-8 text-blue-200 absolute -top-2 -left-2" />
+                <p className="text-gray-700 leading-relaxed pl-6">{t.text}</p>
               </div>
             </motion.div>
           ))}
         </motion.div>
 
-        <motion.div 
+        <motion.div
           initial={{ y: 50, opacity: 0 }}
           whileInView={{ y: 0, opacity: 1 }}
           viewport={{ once: true }}
           transition={{ delay: 0.5, duration: 0.6 }}
-          className="text-center mt-16"
+          className="text-center mt-20"
         >
-          <motion.div 
-            whileHover={{ scale: 1.05 }}
-            className="bg-white rounded-2xl p-8 shadow-lg inline-block cursor-pointer"
-          >
-            <div className="flex items-center justify-center space-x-8">
-              <div className="text-center">
-                <motion.div 
-                  initial={{ scale: 0 }}
-                  whileInView={{ scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, type: "spring" }}
-                  className="text-3xl font-bold text-blue-600"
-                >
-                  4.9
-                </motion.div>
+          <div className="bg-white/90 backdrop-blur-md rounded-3xl p-8 shadow-lg inline-block">
+            <div className="flex items-center justify-center space-x-10">
+              
+              <div>
+                <div className="text-4xl font-extrabold text-blue-600">4.9</div>
                 <div className="flex justify-center my-2">
                   {[...Array(5)].map((_, i) => (
-                    <motion.div
-                      key={i}
-                      initial={{ opacity: 0, scale: 0 }}
-                      whileInView={{ opacity: 1, scale: 1 }}
-                      viewport={{ once: true }}
-                      transition={{ delay: i * 0.1, duration: 0.3 }}
-                      whileHover={{ scale: 1.2, rotate: 360 }}
-                    >
-                      <Star className="w-5 h-5 text-yellow-400 fill-current" />
-                    </motion.div>
+                    <Star key={i} className="w-5 h-5 text-yellow-400 fill-current" />
                   ))}
                 </div>
-                <div className="text-gray-600">Average Rating</div>
+                <div className="text-gray-500">Average Rating</div>
               </div>
+
               <div className="w-px h-16 bg-gray-300"></div>
-              <div className="text-center">
-                <motion.div 
-                  initial={{ scale: 0 }}
-                  whileInView={{ scale: 1 }}
-                  viewport={{ once: true }}
-                  transition={{ duration: 0.5, type: "spring", delay: 0.2 }}
-                  className="text-3xl font-bold text-blue-600"
-                >
-                  2,500+
-                </motion.div>
-                <div className="text-gray-600 mt-2">Reviews</div>
+
+              <div>
+                <div className="text-4xl font-extrabold text-blue-600">2,500+</div>
+                <div className="text-gray-500 mt-2">Reviews</div>
               </div>
+
             </div>
-          </motion.div>
+          </div>
         </motion.div>
       </div>
     </section>

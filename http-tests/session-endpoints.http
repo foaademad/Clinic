@@ -1,0 +1,138 @@
+### Session Endpoints Test File
+### Global Variables
+@baseUrl = https://clinic-beta-silk.vercel.app
+@sessionId = 689604202db4c7dd8abb2bda
+@doctorId = 6895fe144599842a86e02c22
+
+### ========================================
+### SESSION ENDPOINTS
+### ========================================
+
+### 1. Create Session
+POST {{baseUrl}}/api/sessions
+Content-Type: application/json
+
+{
+  "duration": 60,
+  "startTime": "2026-08-08T10:00:00.000Z",
+  "doctor": "{{doctorId}}"
+}
+
+### Expected Success Response:
+# {
+#   "message": "Session created successfully",
+#   "session": {
+#     "_id": "session_id_here",
+#     "duration": 60,
+#     "startTime": "2024-01-20T10:00:00.000Z",
+#     "doctor": "doctor_id_here",
+#     "isBooked": false,
+#     "createdAt": "2024-01-15T10:30:00.000Z",
+#     "updatedAt": "2024-01-15T10:30:00.000Z"
+#   }
+# }
+
+### Expected Error Responses:
+# 400 - Missing required fields:
+# {
+#   "error": "Duration, start time, and doctor are required"
+# }
+#
+# 400 - Invalid duration:
+# {
+#   "error": "Session duration must be at least 15 minutes"
+# }
+#
+# 400 - Invalid start time:
+# {
+#   "error": "Start time must be in the future"
+# }
+#
+# 404 - Doctor not found:
+# {
+#   "error": "Doctor not found"
+# }
+#
+# 400 - User is not a doctor:
+# {
+#   "error": "User is not a doctor"
+# }
+
+### 2. Update Session
+PATCH {{baseUrl}}/api/sessions/{{sessionId}}
+Content-Type: application/json
+
+{
+  "duration": 20,
+  "startTime": "2026-08-08T11:00:00.000Z",
+  "doctor": "{{doctorId}}"
+}
+
+### Expected Success Response:
+# {
+#   "message": "Session updated successfully",
+#   "session": {
+#     "_id": "session_id_here",
+#     "duration": 90,
+#     "startTime": "2024-01-20T11:00:00.000Z",
+#     "doctor": "doctor_id_here",
+#     "isBooked": false,
+#     "createdAt": "2024-01-15T10:30:00.000Z",
+#     "updatedAt": "2024-01-15T10:35:00.000Z"
+#   }
+# }
+
+### Expected Error Responses:
+# 404 - Session not found:
+# {
+#   "error": "Session not found"
+# }
+#
+# 400 - Session already booked:
+# {
+#   "error": "Cannot update a booked session"
+# }
+#
+# 400 - Invalid duration:
+# {
+#   "error": "Session duration must be at least 15 minutes"
+# }
+#
+# 400 - Invalid start time:
+# {
+#   "error": "Start time must be in the future"
+# }
+#
+# 404 - Doctor not found:
+# {
+#   "error": "Doctor not found"
+# }
+#
+# 400 - User is not a doctor:
+# {
+#   "error": "User is not a doctor"
+# }
+
+### 3. Delete Session
+DELETE {{baseUrl}}/api/sessions/{{sessionId}}
+
+### Expected Success Response:
+# {
+#   "message": "Session deleted successfully"
+# }
+
+### Expected Error Responses:
+# 404 - Session not found:
+# {
+#   "error": "Session not found"
+# }
+#
+# 400 - Session already booked:
+# {
+#   "error": "Cannot delete a booked session"
+# }
+#
+# 400 - Invalid session ID format:
+# {
+#   "error": "Invalid session ID format"
+# } 

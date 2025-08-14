@@ -5,6 +5,6 @@ export interface User {
     age: number;
     role: string;
     phone: string;
-    imgaeurl: string;
+    imageUrl?: string;
     password: string;
 }

@@ -12,7 +12,7 @@ import {
   Award,
   ArrowLeft,
 } from "lucide-react";
-import { doctors } from "../data/doctors";
+import { useGetDoctorByIdQuery, useGetDoctorInfoByUserIdQuery } from "../store/api/doctorsApi";
 
 import { useSelector, useDispatch } from "react-redux";
 import { RootState, AppDispatch } from "../store/store";
@@ -21,14 +21,25 @@ import { setSelectedDay } from "../store/slice/doctorDetailSlice";
 const DoctorDetail = () => {
   const dispatch = useDispatch<AppDispatch>();
   const { id } = useParams();
-  const doctor = doctors.find((d) => d.id === id);
+  const { data: info, isLoading, error } = useGetDoctorInfoByUserIdQuery(id as string, { skip: !id });
+  const doctor = (info as any)?.doctor || null;
+  const sessions: Array<{ _id: string; startTime: string; isBooked?: boolean }> =
+    ((info as any)?.doctor?.sessions || (info as any)?.sessions || []) as any[];
 
   // Redux state for selected day
   const selectedDay = useSelector(
     (state: RootState) => state.doctorDetail.selectedDay
   );
 
-  if (!doctor) {
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">Loading doctor...</div>
+      </div>
+    );
+  }
+
+  if (error || !doctor) {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
@@ -81,31 +92,27 @@ const DoctorDetail = () => {
           >
             <div className="bg-white rounded-2xl p-8 shadow-lg">
               <div className="flex flex-col md:flex-row gap-6">
-                <motion.img
-                  whileHover={{ scale: 1.05 }}
-                  src={doctor.image}
-                  alt={doctor.name}
-                  className="w-48 h-48 object-cover rounded-2xl mx-auto md:mx-0"
-                />
+                  <motion.img
+                    whileHover={{ scale: 1.05 }}
+                    src={(doctor as any).image || "/placeholder-image.jpg"}
+                    alt={doctor.User?.name || 'Doctor'}
+                    className="w-48 h-48 object-cover rounded-2xl mx-auto md:mx-0"
+                  />
                 <div className="flex-1">
                   <div className="flex items-center mb-4">
-                    <h1 className="text-3xl font-bold text-gray-900 mr-4">
-                      {doctor.name}
-                    </h1>
+                    <h1 className="text-3xl font-bold text-gray-900 mr-4">{doctor.User?.name || 'Doctor'}</h1>
                     <div className="flex items-center bg-yellow-50 px-3 py-1 rounded-full">
                       <Star className="w-4 h-4 text-yellow-400 fill-current mr-1" />
-                      <span className="font-semibold">{doctor.rating}</span>
+                      <span className="font-semibold">4.5</span>
                     </div>
                   </div>
-                  <p className="text-xl text-blue-600 font-semibold mb-4">
-                    {doctor.specialty}
-                  </p>
+                  <p className="text-xl text-blue-600 font-semibold mb-4">{doctor.speciality || ''}</p>
 
                   <div className="grid md:grid-cols-2 gap-4 mb-6">
                     <div className="flex items-center text-gray-600">
                       <Award className="w-5 h-5 mr-3 text-blue-600" />
                       <div>
-                        <p className="font-semibold">{doctor.experience} Years</p>
+                         <p className="font-semibold">{doctor.experience?.[0] || "Experience"}</p>
                         <p className="text-sm">Experience</p>
                       </div>
                     </div>
@@ -113,27 +120,27 @@ const DoctorDetail = () => {
                       <MapPin className="w-5 h-5 mr-3 text-blue-600" />
                       <div>
                         <p className="font-semibold">Location</p>
-                        <p className="text-sm">{doctor.location}</p>
+                         <p className="text-sm">Location</p>
                       </div>
                     </div>
                     <div className="flex items-center text-gray-600">
                       <Phone className="w-5 h-5 mr-3 text-blue-600" />
                       <div>
                         <p className="font-semibold">Phone</p>
-                        <p className="text-sm">{doctor.phone}</p>
+                         <p className="text-sm">{doctor.User?.phone || '-'}</p>
                       </div>
                     </div>
                     <div className="flex items-center text-gray-600">
                       <Mail className="w-5 h-5 mr-3 text-blue-600" />
                       <div>
                         <p className="font-semibold">Email</p>
-                        <p className="text-sm">{doctor.email}</p>
+                          <p className="text-sm">{doctor.User?.email || '-'}</p>
                       </div>
                     </div>
                   </div>
 
                   <div className="flex flex-wrap gap-2 mb-6">
-                    {doctor.languages.map((language, index) => (
+                     {(doctor as any).languages?.map((language: string, index: number) => (
                       <span
                         key={index}
                         className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm"
@@ -141,13 +148,11 @@ const DoctorDetail = () => {
                         <Globe className="w-3 h-3 inline mr-1" />
                         {language}
                       </span>
-                    ))}
+                     ))}
                   </div>
 
                   <div className="text-center md:text-left">
-                    <span className="text-3xl font-bold text-gray-900">
-                      ${doctor.consultationFee}
-                    </span>
+                     <span className="text-3xl font-bold text-gray-900">${doctor.fees ?? 0}</span>
                     <span className="text-gray-600 ml-2">per consultation</span>
                   </div>
                 </div>
@@ -162,13 +167,13 @@ const DoctorDetail = () => {
               className="bg-white rounded-2xl p-8 shadow-lg"
             >
               <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                About Dr. {doctor.name.split(" ")[1]}
+                  About Dr. {doctor.User?.name || ''}
               </h2>
-              <p className="text-gray-700 leading-relaxed mb-6">{doctor.about}</p>
+              <p className="text-gray-700 leading-relaxed mb-6">Doctor biography will appear here.</p>
 
               <div className="border-t pt-6">
                 <h3 className="text-lg font-semibold text-gray-900 mb-3">Education</h3>
-                <p className="text-gray-700">{doctor.education}</p>
+                 <p className="text-gray-700">{(doctor as any).education || ""}</p>
               </div>
             </motion.div>
 
@@ -201,24 +206,45 @@ const DoctorDetail = () => {
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   Available Times - {selectedDay}
                 </h3>
-                {doctor.availability[selectedDay].length > 0 ? (
-                  <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
-                    {doctor.availability[selectedDay].map((time, index) => (
-                      <motion.div
-                        key={index}
-                        whileHover={{ scale: 1.05 }}
-                        className="bg-green-50 border border-green-200 rounded-lg p-3 text-center cursor-pointer hover:bg-green-100 transition-colors"
-                      >
-                        <Clock className="w-4 h-4 mx-auto mb-1 text-green-600" />
-                        <span className="text-sm font-medium text-green-800">{time}</span>
-                      </motion.div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-gray-500 text-center py-8">
-                    No available times on {selectedDay}
-                  </p>
-                )}
+                {(() => {
+                  const dayIndexMap: Record<string, number> = {
+                    Monday: 1,
+                    Tuesday: 2,
+                    Wednesday: 3,
+                    Thursday: 4,
+                    Friday: 5,
+                    Saturday: 6,
+                    Sunday: 0,
+                  };
+                  const target = dayIndexMap[selectedDay] ?? -1;
+                  const unbookedForDay = sessions.filter((s) => {
+                    const d = new Date(s.startTime);
+                    return !s.isBooked && d.getDay() === target;
+                  });
+                  if (unbookedForDay.length === 0) {
+                    return (
+                      <p className="text-gray-500 text-center py-8">
+                        No available times on {selectedDay}
+                      </p>
+                    );
+                  }
+                  return (
+                    <div className="grid grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                      {unbookedForDay.map((s) => (
+                        <motion.div
+                          key={s._id}
+                          whileHover={{ scale: 1.05 }}
+                          className="bg-green-50 border border-green-200 rounded-lg p-3 text-center cursor-pointer hover:bg-green-100 transition-colors"
+                        >
+                          <Clock className="w-4 h-4 mx-auto mb-1 text-green-600" />
+                          <span className="text-sm font-medium text-green-800">
+                            {new Date(s.startTime).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                          </span>
+                        </motion.div>
+                      ))}
+                    </div>
+                  );
+                })()}
               </div>
             </motion.div>
           </motion.div>
@@ -236,7 +262,7 @@ const DoctorDetail = () => {
               <div className="space-y-4 mb-6">
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Consultation Fee</span>
-                  <span className="font-bold text-gray-900">${doctor.consultationFee}</span>
+                  <span className="font-bold text-gray-900">${doctor.fees}</span>
                 </div>
                 <div className="flex justify-between items-center">
                   <span className="text-gray-600">Duration</span>
@@ -245,7 +271,7 @@ const DoctorDetail = () => {
               </div>
 
               <Link
-                to={`/book/${doctor.id}`}
+                to={`/book/${doctor._id}`}
                 className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors flex items-center justify-center"
               >
                 <Calendar className="w-5 h-5 mr-2" />

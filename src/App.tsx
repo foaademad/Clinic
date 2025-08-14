@@ -8,41 +8,50 @@ import Login from './pages/Login';
 import Signup from './pages/Signup';
 import Doctors from './pages/Doctors';
 import DoctorDetail from './pages/DoctorDetail';
-import Services from './pages/Services';
+import Services from './components/Services';
 import BookSession from './pages/BookSession';
 import About from './pages/About';
 import Contact from './pages/Contact';
-import { Provider } from 'react-redux';
-import { store } from './store/store';
 import AppointmentPage from './pages/BookSession';
 import Hero from './components/Hero.tsx';
+import ProtectedRoute from './components/ProtectedRoute';
+
 function App() {
   return (
-    <Provider store={store}>
-      <AuthProvider> 
-        <Router>
-          <div className="min-h-screen flex flex-col">
-            <Header />
-            <main className="flex-grow">
-              <Routes>
-                <Route path="/" element={<Home />} />
-                <Route path="/login" element={<Login />} />
-                <Route path="/signup" element={<Signup />} />
-                <Route path="/doctors" element={<Doctors />} />
-                <Route path="/doctors/:id" element={<DoctorDetail />} />
-                <Route path="/services" element={<Services />} />
-                <Route path="/book/:doctorId?" element={<BookSession />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/contact" element={<Contact />} />
-                <Route path="/" element={<Hero />} />
-        <Route path="/appointment" element={<AppointmentPage />} />
-              </Routes>
-            </main>
-            <Footer />
-          </div>
-        </Router>
-      </AuthProvider>
-    </Provider>
+    <AuthProvider> 
+      <Router>
+        <div className="min-h-screen flex flex-col">
+          <Header />
+          <main className="flex-grow">
+            <Routes>
+              {/* Public routes - accessible without login */}
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/signup" element={<Signup />} />
+              <Route path="/about" element={<About />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/Home" element={<Hero />} />
+              <Route path="/services" element={<Services />} />
+              <Route path="/doctors" element={<Doctors />} />
+              <Route path="/doctors/:id" element={<DoctorDetail />} />
+              
+              {/* Protected routes - require login */}
+              <Route path="/book/:doctorId?" element={
+                <ProtectedRoute>
+                  <BookSession />
+                </ProtectedRoute>
+              } />
+              <Route path="/appointment" element={
+                <ProtectedRoute>
+                  <AppointmentPage />
+                </ProtectedRoute>
+              } />
+            </Routes>
+          </main>
+          <Footer />
+        </div>
+      </Router>
+    </AuthProvider>
   );
 }
 
